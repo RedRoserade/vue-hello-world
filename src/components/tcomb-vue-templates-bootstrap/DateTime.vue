@@ -3,7 +3,7 @@
     <label class="control-label" :for="name">{{ label }}</label>
     <div class="row">
       <input type="hidden" :value="valueAsDateString" :name="name" />
-      <div class="col-sm-2">
+      <div class="col-sm-2 col-xs-4 form-group">
         <input
           class="form-control"
           type="number"
@@ -15,7 +15,7 @@
         />
       </div>
 
-      <div class="col-sm-2">
+      <div class="col-sm-2 col-xs-4 form-group">
         <select :value="monthValue" @input="handleMonthChange" class="form-control">
           <option value="0">1</option>
           <option value="1">2</option>
@@ -32,7 +32,7 @@
         </select>
       </div>
 
-      <div class="col-sm-2">
+      <div class="col-sm-2 col-xs-4 form-group">
         <input
           class="form-control"
           type="number"

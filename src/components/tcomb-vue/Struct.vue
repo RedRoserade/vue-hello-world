@@ -1,16 +1,11 @@
 <script>
 import { getInputFactory, ValidationResult, log } from './util'
 
-import FormGroup from './FormGroup.vue'
-
 import Struct from '../tcomb-vue-templates-bootstrap/Struct.vue'
 
 export default {
   name: 't-struct',
   props: ['type', 'value', 'name', 'path'],
-  components: {
-    't-formgroup': FormGroup
-  },
   data () {
     return {
       inputs: Object.entries(this.type.meta.props)

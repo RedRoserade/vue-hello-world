@@ -1,8 +1,10 @@
+import t from 'tcomb'
 import { validate } from 'tcomb-validation'
 
 import TextBox from './TextBox.vue'
 import Select from './Select.vue'
 import Struct from './Struct.vue'
+import List from './List.vue'
 
 export const log = {
   trace (...args) { console.debug('[tcomb-vue]', ...args) }
@@ -22,11 +24,14 @@ export function getInputFactory (type, options = undefined) {
     case 'interface':
       return Struct
     case 'list':
-      console.log('TODO List')
-      break
+      return List
     case 'maybe':
-      console.log('TODO maybe', type)
-      break
+      return getInputFactory(type.meta.type, options)
+    case 'irreducible':
+      switch (type) {
+        case t.String:
+          return TextBox
+      }
   }
 
   return TextBox
@@ -62,4 +67,12 @@ export class ValidationResult {
 
     return this.errors[0]
   }
+}
+
+export function getBaseType (type) {
+  if (type.meta.kind === 'maybe' || type.meta.kind === 'list') {
+    return getBaseType(type.meta.type)
+  }
+
+  return type
 }

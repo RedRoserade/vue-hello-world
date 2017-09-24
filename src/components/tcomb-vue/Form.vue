@@ -25,7 +25,7 @@ export default {
       this.$emit('change', this.currentValue)
     },
     validate () {
-      return this.$refs.formComponent.validate()
+      return t.validate(this.currentValue, this.type)
     },
     getValue () {
       const validationResult = this.validate()
@@ -34,13 +34,7 @@ export default {
         return null
       }
 
-      const result = t.validate(this.currentValue, this.type)
-
-      if (!result.isValid()) {
-        return null
-      }
-
-      return result.value
+      return validationResult.value
     }
   },
   render (h) {

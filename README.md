@@ -1,6 +1,8 @@
-# hello-world
+# vue-hello-world
 
-> A Vue.js project
+A Vue.js project for me to familiarize myself with the framework. Quickly evolved into an attempt to recreate gcanti/tcomb-form, but in Vue, since I view it as a good example to try dynamic components and see what can be used for what.
+
+Below is the rest of the `vue-cli` template output.
 
 ## Build Setup
 
