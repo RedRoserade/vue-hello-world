@@ -1,5 +1,30 @@
+<template>
+  <component
+    :is="templateComponent"
+    :name="name"
+    :value="value"
+    :type="type"
+    @add="handleAdd"
+    @remove="handleRemove"
+    @swap="handleSwap"
+  >
+    <component
+      v-for="(v, index) in value || []"
+      :is="itemTemplateComponent"
+      :key="index"
+      :ref="`item_${index}`"
+      :slot="index"
+      :value="value[index]"
+      :type="baseType"
+      :path="[...path, index]"
+      @change="handleChange(index, $event)"
+    />
+  </component>
+</template>
+
+
 <script>
-import { ValidationResult/*, pathToString */, getBaseType, getInputFactory } from './util'
+import { ValidationResult, getBaseType, getInputFactory } from './util'
 
 import List from '../tcomb-vue-templates-bootstrap/List.vue'
 
@@ -10,49 +35,13 @@ export default {
   },
   props: ['type', 'value', 'name', 'path'],
   data () {
-    return {
-      label: this.name
-    }
-  },
-  render (h) {
     const baseType = getBaseType(this.type)
-    const componentType = getInputFactory(baseType)
-    const value = this.value || []
 
-    const items = value.map((v, i) => {
-      const path = [...this.path, i]
-
-      return h(
-        componentType,
-        {
-          props: {
-            // name: pathToString(path),
-            value: v,
-            type: baseType,
-            path: path
-          },
-          on: {
-            change: updated => this.handleChange(i, updated)
-          },
-          slot: i,
-          key: i,
-          ref: `item__${i}`
-        }
-      )
-    })
-
-    return (
-      <t-list-bootstrap
-        name={this.name}
-        type={baseType}
-        value={this.value}
-        onAdd={this.handleAdd}
-        onRemove={this.handleRemove}
-        onSwap={this.handleSwap}
-      >
-        {items}
-      </t-list-bootstrap>
-    )
+    return {
+      baseType: baseType,
+      itemTemplateComponent: getInputFactory(baseType),
+      templateComponent: List
+    }
   },
   methods: {
     handleAdd () {

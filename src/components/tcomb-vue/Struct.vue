@@ -1,3 +1,21 @@
+<template>
+  <component :is="templateComponent" :name="name" :type="type" :value="value">
+    <component
+      v-for="input in inputs"
+      :key="input.name"
+      :ref="_getInputRefName(input.name)"
+      :slot="input.name"
+      :is="input.component"
+      :name="input.name"
+      :type="input.type"
+      :value="_safeGetValue(input.name)"
+      :path="[...path, input.name]"
+      @change="handleChange(input.name, $event)"
+    />
+  </component>
+</template>
+
+
 <script>
 import t from 'tcomb-validation'
 
@@ -10,43 +28,11 @@ export default {
   props: ['type', 'value', 'name', 'path'],
   data () {
     return {
+      templateComponent: Struct,
       hasError: false,
       inputs: Object.entries(this.type.meta.props)
         .map(([name, type]) => ({ name, type, component: getInputFactory(type) }))
     }
-  },
-  render (h) {
-    const fields = this.inputs
-      .map(({ name, type, component }) => {
-        return h(component,
-          {
-            props: {
-              name,
-              type,
-              value: this._safeGetValue(name),
-              path: [...this.path, name]
-            },
-            on: {
-              change: updated => this.handleChange(name, updated)
-            },
-            ref: this._getInputRefName(name),
-            slot: name
-          },
-          null
-        )
-      })
-
-    return h(
-      Struct,
-      {
-        props: {
-          name: this.name,
-          type: this.type,
-          value: this.value
-        }
-      },
-      fields
-    )
   },
   methods: {
     _getInputRefName (name) {
