@@ -1,7 +1,8 @@
 <template>
-  <div :class="{ 'form-group': true, 'has-error': this.hasError }">
-    <label class="control-label" :for="name">{{ label }}</label>
-    <div class="row">
+  <t-form-group-bootstrap :hasError="hasError" :name="name">
+    <span v-if="!!label" slot="label">{{ label }}</span>
+
+    <div class="row" slot="input">
       <input type="hidden" :value="valueAsDateString" :name="name" />
       <div class="col-sm-2 col-xs-4 form-group">
         <input
@@ -44,12 +45,17 @@
         />
       </div>
     </div>
-  </div>
+  </t-form-group-bootstrap>
 </template>
 
 <script>
+import FormGroup from './FormGroup.vue'
+
 export default {
   name: 't-datetime-bootstrap',
+  components: {
+    't-form-group-bootstrap': FormGroup
+  },
   props: ['value', 'name', 'hasError'],
   data () {
     const data = {

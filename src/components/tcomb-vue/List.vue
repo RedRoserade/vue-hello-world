@@ -64,13 +64,13 @@ export default {
       }
 
       return Object.values(this.$refs)
-        .filter(x => typeof x.getValue === 'function')
-        .map(x => x.getValue())
+        // .filter(x => typeof x[0].getValue === 'function')
+        .map(x => x[0].getValue())
     },
     validate () {
       const errors = Object.values(this.$refs)
-        .filter(x => typeof x.validate === 'function')
-        .map(x => x.validate())
+        // .filter(x => typeof x[0].validate === 'function')
+        .map(x => x[0].validate())
         .filter(x => !x.isValid())
 
       return new ValidationResult(errors)

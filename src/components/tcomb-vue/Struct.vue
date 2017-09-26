@@ -39,13 +39,9 @@ export default {
       return `input__${name}`
     },
     getValue () {
-      if (this.value == null && this.type.meta.kind !== 'maybe') {
-        return {}
-      }
-
       const value = this.inputs
         .reduce((acc, { name }) => {
-          const input = this.$refs[this._getInputRefName(name)]
+          const input = this.$refs[this._getInputRefName(name)][0]
 
           if (typeof input.getValue === 'function') {
             const value = input.getValue()
@@ -55,6 +51,10 @@ export default {
 
           return acc
         }, {})
+
+      if (this.value == null && this.type.meta.kind !== 'maybe') {
+        return {}
+      }
 
       const validationResult = t.validate(value, this.type)
 
@@ -81,8 +81,8 @@ export default {
       log.trace('validating t-fieldset', this.path)
 
       const validationErrors = Object.values(this.$refs)
-        .filter(r => typeof r.validate === 'function')
-        .map(r => r.validate())
+        // .filter(r => typeof r[0].validate === 'function')
+        .map(r => r[0].validate())
         .filter(r => !r.isValid())
 
       const result = new ValidationResult(validationErrors)
