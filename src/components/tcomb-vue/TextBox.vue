@@ -14,6 +14,13 @@ export default {
     }
   },
   methods: {
+    getValue () {
+      const result = t.validate(this.value, this.type)
+
+      this.hasError = !result.isValid()
+
+      return result.value
+    },
     handleChange (value) {
       this.$emit('change', value)
     },

@@ -1,6 +1,6 @@
 <template>
   <select v-bind:name="name" v-bind:value="value" v-on:change="handleChange">
-    <option v-for="option in options" v-bind:value="option.value">
+    <option v-for="option in options" :value="option.value" :key="option.value">
       {{ option.text }}
     </option>
   </select>
@@ -8,8 +8,15 @@
 
 
 <script>
+import t from 'tcomb-validation'
+
 export default {
   props: ['type', 'value', 'name'],
+  data () {
+    return {
+      hasError: false
+    }
+  },
   computed: {
     options () {
       const { map } = this.type.meta
@@ -18,6 +25,13 @@ export default {
     }
   },
   methods: {
+    getValue () {
+      const result = t.validate(this.value, this.type)
+
+      this.hasError = !result.isValid()
+
+      return result.value
+    },
     handleChange (evt) {
       this.$emit('change', evt.target.value)
     }

@@ -1,7 +1,7 @@
 <script>
 import t from 'tcomb-validation'
 
-import { getInputFactory } from './util'
+import { getInputFactory, log } from './util'
 
 import './setup'
 
@@ -28,9 +28,12 @@ export default {
       return t.validate(this.currentValue, this.type)
     },
     getValue () {
-      const validationResult = this.validate()
+      const value = this.$refs.formComponent.getValue()
+
+      const validationResult = t.validate(value, this.type)
 
       if (!validationResult.isValid()) {
+        log.trace('Failed validation', validationResult, 'value:', value)
         return null
       }
 

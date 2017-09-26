@@ -1,4 +1,6 @@
 <script>
+import t from 'tcomb-validation'
+
 import { getInputFactory, ValidationResult, log } from './util'
 
 import Struct from '../tcomb-vue-templates-bootstrap/Struct.vue'
@@ -8,6 +10,7 @@ export default {
   props: ['type', 'value', 'name', 'path'],
   data () {
     return {
+      hasError: false,
       inputs: Object.entries(this.type.meta.props)
         .map(([name, type]) => ({ name, type, component: getInputFactory(type) }))
     }
@@ -15,43 +18,65 @@ export default {
   render (h) {
     const fields = this.inputs
       .map(({ name, type, component }) => {
-        const field = h(component,
+        return h(component,
           {
             props: {
               name,
               type,
-              value: this.tryGetValue(name),
+              value: this._safeGetValue(name),
               path: [...this.path, name]
             },
             on: {
               change: updated => this.handleChange(name, updated)
             },
-            ref: `input__${name}`
+            ref: this._getInputRefName(name),
+            slot: name
           },
           null
         )
-
-        return { name, field }
       })
-      .reduce((acc, v) => {
-        acc[v.name] = v.field
-
-        return acc
-      }, {})
 
     return h(
       Struct,
       {
         props: {
-          fields: fields,
           name: this.name,
-          type: this.type
+          type: this.type,
+          value: this.value
         }
-      }
+      },
+      fields
     )
   },
   methods: {
-    tryGetValue (name) {
+    _getInputRefName (name) {
+      return `input__${name}`
+    },
+    getValue () {
+      if (this.value == null && this.type.meta.kind !== 'maybe') {
+        return {}
+      }
+
+      const value = this.inputs
+        .reduce((acc, { name }) => {
+          const input = this.$refs[this._getInputRefName(name)]
+
+          if (typeof input.getValue === 'function') {
+            const value = input.getValue()
+
+            acc[name] = value
+          }
+
+          return acc
+        }, {})
+
+      const validationResult = t.validate(value, this.type)
+
+      this.hasError = !validationResult.isValid()
+
+      return value
+    },
+    _safeGetValue (name) {
       if (this.value == null) {
         return null
       }

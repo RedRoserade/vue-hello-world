@@ -39,13 +39,13 @@ const Test = t.struct({
     nestedString: t.String,
     someNestedDate: t.Date
   }),
-  myList: t.maybe(t.list(t.String))
-  // myListOfObjects: t.list(
-  //   t.struct({
-  //     whatever: t.String,
-  //     somethingElse: t.Date
-  //   })
-  // )
+  myList: t.maybe(t.list(t.String)),
+  myListOfObjects: t.list(
+    t.struct({
+      whatever: t.String,
+      somethingElse: t.Date
+    })
+  )
 })
 
 export default {

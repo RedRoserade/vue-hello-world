@@ -1,12 +1,12 @@
 <script>
-import { ValidationResult, pathToString, getBaseType } from './util'
+import { ValidationResult/*, pathToString */, getBaseType, getInputFactory } from './util'
 
-import ListItem from './ListItem.vue'
+import List from '../tcomb-vue-templates-bootstrap/List.vue'
 
 export default {
   name: 't-list',
   components: {
-    't-list-item': ListItem
+    't-list-bootstrap': List
   },
   props: ['type', 'value', 'name', 'path'],
   data () {
@@ -16,38 +16,42 @@ export default {
   },
   render (h) {
     const baseType = getBaseType(this.type)
+    const componentType = getInputFactory(baseType)
     const value = this.value || []
 
     const items = value.map((v, i) => {
       const path = [...this.path, i]
 
-      return (
-        <t-list-item
-          name={pathToString(path)}
-          value={v}
-          path={path}
-          index={i}
-          isFirst={i === 0}
-          isLast={i === value.length - 1}
-          type={baseType}
-          onChange={updated => this.handleChange(i, updated)}
-          onRemove={() => this.handleRemove(i)}
-          onSwap={this.handleSwap}
-          ref={`item__${i}`}
-        />
+      return h(
+        componentType,
+        {
+          props: {
+            // name: pathToString(path),
+            value: v,
+            type: baseType,
+            path: path
+          },
+          on: {
+            change: updated => this.handleChange(i, updated)
+          },
+          slot: i,
+          key: i,
+          ref: `item__${i}`
+        }
       )
     })
 
     return (
-      <fieldset>
-        {this.label && <legend>{this.label}</legend>}
-
+      <t-list-bootstrap
+        name={this.name}
+        type={baseType}
+        value={this.value}
+        onAdd={this.handleAdd}
+        onRemove={this.handleRemove}
+        onSwap={this.handleSwap}
+      >
         {items}
-
-        <div class='form-group'>
-          <button class='btn btn-default' type='button' onClick={this.handleAdd}>Add</button>
-        </div>
-      </fieldset>
+      </t-list-bootstrap>
     )
   },
   methods: {
@@ -64,11 +68,15 @@ export default {
       this.$emit('change', this.value)
     },
     getValue () {
+      // Return an empty list by default to prevent errors with the
+      // component is initialized with null values.
       if (this.value == null && this.type.meta.kind !== 'maybe') {
         return []
       }
 
-      return this.value
+      return Object.values(this.$refs)
+        .filter(x => typeof x.getValue === 'function')
+        .map(x => x.getValue())
     },
     validate () {
       const errors = Object.values(this.$refs)
